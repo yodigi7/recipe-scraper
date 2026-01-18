@@ -1,0 +1,2 @@
+class NotOKHttpResponse(Exception):
+    pass
