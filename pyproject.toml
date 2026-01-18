@@ -14,7 +14,8 @@ dependencies = [
     "pyodbc (>=5.3.0,<6.0.0)",
     "azure-identity (>=1.25.1,<2.0.0)",
     "tenacity (>=9.1.2,<10.0.0)",
-    "pre-commit (>=4.5.1,<5.0.0)"
+    "pre-commit (>=4.5.1,<5.0.0)",
+    "lxml (>=6.0.2,<7.0.0)"
 ]
 
 [tool.poetry]
@@ -25,4 +26,4 @@ requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.black]
-line-length = 130
+line-length = 120
