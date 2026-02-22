@@ -12,7 +12,11 @@ logger = logging.getLogger(__name__)
 
 
 def map_recipe_for_db(recipe: domain_models.Recipe) -> models.Recipe:
-    return models.Recipe(canonical_url=recipe.canonical_url, json=recipe.json, last_scraped=recipe.last_scraped)
+    return models.Recipe(
+        canonical_url=recipe.canonical_url,
+        json_data=recipe.json_data,
+        last_scraped=recipe.last_scraped,
+    )
 
 
 @retry(
@@ -31,7 +35,7 @@ def upsert_to_db(recipe: models.Recipe):
                 update(models.Recipe)
                 .where(models.Recipe.canonical_url == recipe.canonical_url)
                 .values(
-                    json=recipe.json,
+                    json_data=recipe.json_data,
                     version=recipe.version,
                 )
             )

@@ -5,7 +5,12 @@ from datetime import datetime
 import httpx
 from lxml import etree
 from recipe_scrapers import scrape_html
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential_jitter
+from tenacity import (
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential_jitter,
+)
 
 from domain_models import Recipe, UrlStatus
 from errors import NotOKHttpResponse
@@ -21,7 +26,7 @@ async def scrape_recipe(url) -> Recipe:
 
 @retry(
     retry=retry_if_exception_type(NotOKHttpResponse),
-    stop=stop_after_attempt(3),
+    stop=stop_after_attempt(2),
     wait=wait_exponential_jitter(initial=3, exp_base=3, jitter=3),
 )
 async def get_webpage(url: str) -> str:
@@ -43,7 +48,9 @@ def load_sitemap(sitemap_data: str) -> list[UrlStatus]:
     url_statuses = []
     for url_item in url_items:
         url = url_item.findtext("ns:loc", namespaces=ns_map)
-        lastmod = datetime.fromisoformat(url_item.findtext("ns:lastmod", namespaces=ns_map))
+        lastmod = datetime.fromisoformat(
+            url_item.findtext("ns:lastmod", namespaces=ns_map)
+        )
         url_statuses.append(UrlStatus(url, lastmod))
     return url_statuses
 
