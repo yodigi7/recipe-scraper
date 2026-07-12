@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Any, Dict
 
 from pydantic import ConfigDict, model_validator
-from sqlalchemy import Computed, Index, text, DateTime, String
+from sqlalchemy import Computed, text, DateTime, String
 from sqlalchemy.dialects.postgresql import JSONB, BYTEA
 from sqlmodel import Column, Field, SQLModel, FetchedValue
 
@@ -57,8 +57,6 @@ class Recipe(SQLModel, table=True):
             BYTEA,
             Computed("digest(canonical_url, 'sha256')", persisted=True),
             nullable=True,
-            unique=True,  # Ensures PostgreSQL uses a B-tree unique index
+            unique=True,
         ),
     )
-
-    __table_args__ = (Index("IX_recipe_url_hash", "url_hash"),)
