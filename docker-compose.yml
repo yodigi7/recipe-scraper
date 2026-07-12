@@ -36,7 +36,7 @@ services:
           action: rebuild
         - path: ./producer/pyproject.toml
           action: rebuild
-        - path: ./producer/poetry.lock
+        - path: ./producer/uv.lock
           action: rebuild
         # Sync source code changes instantly
         - path: ./producer
@@ -54,7 +54,7 @@ services:
           action: rebuild
         - path: ./worker/pyproject.toml
           action: rebuild
-        - path: ./worker/poetry.lock
+        - path: ./worker/uv.lock
           action: rebuild
         # Sync source code changes instantly
         - path: ./worker/src

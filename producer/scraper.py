@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Protocol, List, ClassVar
 
 
@@ -35,7 +35,6 @@ async def get_webpage(url: str) -> str:
     logger.debug(f"Successfully retrieved webpage from URL: {url}")
     return response.text
 
-
 def basic_load_sitemap(sitemap_data: str) -> List[UrlStatus]:
     tree = etree.fromstring(sitemap_data.encode("utf-8"))
 
@@ -51,7 +50,11 @@ def basic_load_sitemap(sitemap_data: str) -> List[UrlStatus]:
 
         if loc and lastmod_text:
             clean_date = lastmod_text[0].strip()
+            # Parse the datetime string
             lastmod = datetime.fromisoformat(clean_date)
+            # Ensure it is timezone-aware. If naive, assume UTC.
+            if lastmod.tzinfo is None:
+                lastmod = lastmod.replace(tzinfo=timezone.utc)
 
             url_statuses.append(UrlStatus(loc[0], lastmod))
 
@@ -71,7 +74,7 @@ def basic_load_sitemap_no_lastmod(sitemap_data: str) -> List[UrlStatus]:
         loc = url_node.xpath("./s:loc/text()", namespaces=ns_map)
 
         if loc:
-            url_statuses.append(UrlStatus(loc[0], datetime.now()))
+            url_statuses.append(UrlStatus(loc[0], datetime.now(timezone.utc)))
 
     return url_statuses
 
@@ -106,6 +109,8 @@ class AllRecipesSitemapLoader(SitemapLoader):
             lastmod = datetime.fromisoformat(
                 url_item.findtext("ns:lastmod", namespaces=ns_map)
             )
+            if lastmod.tzinfo is None:
+                lastmod = lastmod.replace(tzinfo=timezone.utc)
             url_statuses.append(UrlStatus(url, lastmod))
         return url_statuses
 
