@@ -1,5 +1,6 @@
 import logging
 from dataclasses import dataclass
+from logging.handlers import RotatingFileHandler
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -7,7 +8,7 @@ logger.setLevel(logging.DEBUG)
 console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.INFO)
 
-file_handler = logging.FileHandler("/app/logs/logging.txt", mode="w")
+file_handler = RotatingFileHandler("/app/logs/logging.txt", maxBytes=10_485_760, backupCount=3)
 file_handler.setLevel(logging.DEBUG)
 
 formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(module)s - %(lineno)d - %(message)s")
