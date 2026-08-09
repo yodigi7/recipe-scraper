@@ -12,9 +12,8 @@ Architecture: `producer` -> `RabbitMQ` -> `worker` -> `PostgreSQL`
 recipe-scraper/
 ├── docker-compose.yml          # 4 services: db, rabbitmq, producer, worker
 ├── .gitignore
-├── .pre-commit-config.yaml     # black 25.1.0, isort 7.0.0, pre-commit-hooks
+├── .pre-commit-config.yaml     # ruff, pre-commit-hooks
 ├── AGENTS.md                   # this file
-├── CODE_REVIEW.md              # prior review notes
 │
 ├── producer/                   # Sitemap fetcher + RabbitMQ publisher
 │   ├── Dockerfile              # uv-based, python:3.14-slim-bookworm
@@ -137,7 +136,7 @@ Each implements `SitemapLoader` protocol with `queue_name`, `sitemaps`, `load_si
 - `last_scraped`: DateTime(tz)
 - `version`: String(15)
 - `url_hash`: BYTEA, computed `digest(canonical_url, 'sha256')`, **unique**, persisted
-- Index: `IX_recipe_url_hash` on `url_hash`
+- Index: `IX_recipe_url_hash` on `url_hash` (note: redundant — the `UNIQUE` constraint on `url_hash` already creates a unique B-tree index automatically)
 
 `init_db()` in `worker/src/db.py` enables the `pgcrypto` extension (required for `digest()`) and creates all tables.
 
@@ -188,3 +187,4 @@ Both services use **uv** (`uv sync`, `uv run`). Lock files: `producer/uv.lock`, 
 5. **The producer and worker share the same RabbitMQ and DB credentials** — updates must stay in sync.
 6. **Pre-commit hooks use Ruff**. After adding Ruff dep, run `uv sync` then `pre-commit install` in each service.
 7. **Secrets are mirrored** in `.env`, `docker-compose.yml`, and `producer/db.py`/`worker/src/db.py` — change all four when rotating credentials.
+8. **Always ask before committing or pushing changes** — do not auto-commit.
